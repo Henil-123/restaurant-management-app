@@ -23,7 +23,8 @@ const CartBillModal = () => {
   const [discountAmount, setDiscountAmount] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  if (!isCartModalOpen && !activeBillDetail) return null;
+  // isCartModalOpen is not in context — this modal is only used when explicitly opened via setIsCartModalOpen
+  if (!isCartModalOpen) return null;
 
   // Calculate Subtotal, Tax, Discount, Grand Total
   const subtotal = cartSubtotal;
@@ -86,7 +87,7 @@ const CartBillModal = () => {
         {activeBillDetail ? (
           /* Created Bill / Receipt Printable View */
           <div style={{ padding: '1.5rem' }}>
-            <div className="printable-receipt" style={{
+            <div style={{
               background: 'rgba(9, 13, 22, 0.8)',
               border: '1px border rgba(255, 255, 255, 0.1)',
               borderRadius: '12px',

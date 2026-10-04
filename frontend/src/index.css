@@ -960,40 +960,63 @@ a      { text-decoration: none; color: inherit; }
 }
 
 /* ============================================
-   PRINT RECEIPT ONLY STYLES
+   PRINT RECEIPT — Single Page, No Repeats
    ============================================ */
 @media print {
-  /* Hide all normal content and layout elements */
-  body, html, nav, footer, .modal-overlay {
-    background: #ffffff !important;
+  @page {
+    size: A5 portrait;
+    margin: 8mm;
   }
 
+  /* Hide everything on the page */
   body * {
     visibility: hidden !important;
   }
 
-  /* Make ONLY printable receipt visible */
-  .printable-receipt, .printable-receipt * {
+  /* Show only the receipt content */
+  .printable-receipt,
+  .printable-receipt * {
     visibility: visible !important;
   }
 
+  /* Position receipt at top-left of the page */
   .printable-receipt {
-    position: absolute !important;
-    left: 0 !important;
+    position: fixed !important;
     top: 0 !important;
+    left: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
     margin: 0 !important;
-    padding: 24px !important;
+    padding: 12px 16px !important;
     background: #ffffff !important;
     color: #000000 !important;
     box-shadow: none !important;
     border: none !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    font-size: 12px !important;
   }
 
-  /* Hide print/action buttons during printing */
-  .no-print, button {
+  /* Force all text black for clean print */
+  .printable-receipt h2,
+  .printable-receipt h3,
+  .printable-receipt p,
+  .printable-receipt span,
+  .printable-receipt td,
+  .printable-receipt th {
+    color: #000000 !important;
+  }
+
+  /* Hide all buttons, close icons, action bars */
+  .no-print,
+  .no-print *,
+  button {
     display: none !important;
+    visibility: hidden !important;
   }
 }
 
