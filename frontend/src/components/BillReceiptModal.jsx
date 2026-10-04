@@ -7,7 +7,94 @@ const BillReceiptModal = () => {
   if (!activeBillDetail) return null;
 
   const handlePrint = () => {
-    window.print();
+    const bill = activeBillDetail;
+    const items = bill.items && bill.items.length > 0
+      ? bill.items.map((item) => {
+          const name = item.food_name || item.name || 'Item';
+          const qty = item.quantity || 1;
+          const price = parseFloat(item.price || 0).toFixed(2);
+          const sub = parseFloat(item.subtotal || 0).toFixed(2);
+          return `
+            <tr>
+              <td style="padding:6px 4px;border-bottom:1px solid #eee;font-weight:600;">${name}</td>
+              <td style="padding:6px 4px;border-bottom:1px solid #eee;text-align:center;">x${qty}</td>
+              <td style="padding:6px 4px;border-bottom:1px solid #eee;text-align:right;">&#8377;${price}</td>
+              <td style="padding:6px 4px;border-bottom:1px solid #eee;text-align:right;font-weight:700;">&#8377;${sub}</td>
+            </tr>`;
+        }).join('')
+      : `<tr><td colspan="4" style="padding:12px;text-align:center;color:#888;">No items found.</td></tr>`;
+
+    const receiptHTML = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Receipt - ${bill.bill_number}</title>
+  <style>
+    @page { size: A5 portrait; margin: 12mm; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #000; background: #fff; }
+    .header { text-align: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #1a3c34; }
+    .header h1 { font-size: 22px; font-weight: 900; letter-spacing: 3px; color: #1a3c34; }
+    .header p { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #666; margin-top: 2px; }
+    .header .inv { font-size: 12px; font-weight: 800; margin-top: 8px; color: #1a3c34; }
+    .meta { background: #f8fafc; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 16px; font-size: 12px; line-height: 1.8; }
+    .meta-row { display: flex; justify-content: space-between; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 12px; }
+    thead tr { border-bottom: 2px solid #333; }
+    th { padding: 8px 4px; text-align: left; font-weight: 800; }
+    th:nth-child(2) { text-align: center; }
+    th:nth-child(3), th:nth-child(4) { text-align: right; }
+    .totals { border-top: 2px solid #333; padding-top: 10px; font-size: 13px; }
+    .total-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .grand { font-size: 17px; font-weight: 900; color: #1a3c34; border-top: 1px solid #eee; padding-top: 6px; margin-top: 4px; }
+    .footer { text-align: center; margin-top: 16px; padding-top: 12px; border-top: 1px dashed #ccc; font-size: 11px; color: #666; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>SPICE HAVEN</h1>
+    <p>Indian Restaurant &amp; Caffe</p>
+    <div class="inv">INVOICE RECEIPT #: <strong>${bill.bill_number}</strong></div>
+  </div>
+  <div class="meta">
+    <div class="meta-row">
+      <span><strong>Customer:</strong> ${bill.customer_name || 'Walk-in Customer'}</span>
+      <span><strong>Table:</strong> ${bill.table_number || '—'}</span>
+    </div>
+    <div class="meta-row">
+      <span><strong>Payment:</strong> ${bill.payment_method || 'Cash'}</span>
+      <span><strong>Status:</strong> <span style="color:#166534;font-weight:800;">Paid</span></span>
+    </div>
+    <div><strong>Date:</strong> ${new Date(bill.created_at || Date.now()).toLocaleString()}</div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Dish Name</th>
+        <th style="text-align:center;">Qty</th>
+        <th style="text-align:right;">Price</th>
+        <th style="text-align:right;">Total</th>
+      </tr>
+    </thead>
+    <tbody>${items}</tbody>
+  </table>
+  <div class="totals">
+    <div class="total-row"><span>Subtotal:</span><span>&#8377;${parseFloat(bill.subtotal || 0).toFixed(2)}</span></div>
+    <div class="total-row"><span>GST / Tax (5%):</span><span>&#8377;${parseFloat(bill.tax || 0).toFixed(2)}</span></div>
+    <div class="total-row grand"><span>Grand Total:</span><span>&#8377;${parseFloat(bill.grand_total || 0).toFixed(2)}</span></div>
+  </div>
+  <div class="footer">Thank you for dining with Spice Haven! &#127798;<br>500 Terry Francine St, San Francisco CA</div>
+</body>
+</html>`;
+
+    const printWindow = window.open('', '_blank', 'width=600,height=800');
+    printWindow.document.write(receiptHTML);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 300);
   };
 
   const handleClose = () => {
