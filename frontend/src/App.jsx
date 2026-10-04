@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AuthModal from './components/AuthModal';
 import CartDrawer from './components/CartDrawer';
+import BillReceiptModal from './components/BillReceiptModal';
 import Home from './pages/Home';
 import Menu from './pages/Menu';
 import BookTable from './pages/BookTable';
@@ -63,6 +64,7 @@ const MainApp = () => {
       {/* Global Modals & Drawers */}
       <AuthModal />
       <CartDrawer />
+      <BillReceiptModal />
 
       <Footer />
     </div>

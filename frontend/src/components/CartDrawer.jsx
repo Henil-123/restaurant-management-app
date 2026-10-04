@@ -12,7 +12,6 @@ const CartDrawer = () => {
     removeFromCart, 
     clearCart,
     createBill,
-    activeBillDetail,
     setActiveBillDetail
   } = useRestaurant();
 
@@ -50,104 +49,75 @@ const CartDrawer = () => {
 
     const res = await createBill(billData);
     setIsSubmitting(false);
-  };
 
-  const handlePrint = () => {
-    window.print();
+    if (res) {
+      setIsCartOpen(false);
+      setActiveBillDetail(res);
+    }
   };
 
   return (
-    <div className="modal-overlay" onClick={() => setIsCartOpen(false)}>
+    <div 
+      className="modal-overlay" 
+      onClick={() => setIsCartOpen(false)}
+      style={{ 
+        position: 'fixed', 
+        inset: 0, 
+        background: 'rgba(0,0,0,0.75)', 
+        zIndex: 99999, 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        padding: '16px',
+        overflowY: 'auto'
+      }}
+    >
       <div 
         className="modal-content" 
         onClick={(e) => e.stopPropagation()} 
-        style={{ maxWidth: '540px', background: '#ffffff', color: '#000000', padding: '24px' }}
+        style={{ 
+          maxWidth: '540px', 
+          width: '100%', 
+          background: '#ffffff', 
+          color: '#000000', 
+          padding: '28px', 
+          borderRadius: '16px', 
+          boxShadow: '0 25px 60px rgba(0,0,0,0.35)', 
+          margin: 'auto',
+          maxHeight: '90vh',
+          overflowY: 'auto',
+          position: 'relative'
+        }}
       >
-        <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '2px solid var(--accent-dark)', paddingBottom: '12px' }}>
-          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: '900', color: 'var(--accent-dark)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '2px solid var(--accent-dark)', paddingBottom: '12px' }}>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: '900', color: 'var(--accent-dark)', margin: 0 }}>
             🛒 YOUR ORDER CART
           </h2>
           <button 
-            onClick={() => { setIsCartOpen(false); setActiveBillDetail(null); }}
-            style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', fontWeight: 'bold' }}
+            onClick={() => setIsCartOpen(false)}
+            style={{ background: 'none', border: 'none', fontSize: '22px', cursor: 'pointer', fontWeight: 'bold', color: '#666' }}
           >
             ✕
           </button>
         </div>
 
-        {/* Bill Receipt View (if bill just created) */}
-        {activeBillDetail ? (
-          <div className="printable-receipt" style={{ textAlign: 'center', padding: '16px' }}>
-            <div className="no-print" style={{ fontSize: '40px', marginBottom: '8px' }}>🎉</div>
-            <h3 style={{ fontFamily: 'var(--font-display)', color: 'var(--accent-dark)', fontSize: '22px' }}>Spice Haven Invoice</h3>
-            <p style={{ color: 'var(--gray)', fontSize: '13px', marginBottom: '16px' }}>
-              Bill Number: <strong>{activeBillDetail.bill_number}</strong>
-            </p>
-
-            <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', textAlign: 'left', marginBottom: '16px', fontSize: '13px', border: '1px solid #e2e8f0' }}>
-              <p><strong>Customer:</strong> {activeBillDetail.customer_name}</p>
-              <p><strong>Table / Order:</strong> {activeBillDetail.table_number}</p>
-              <p><strong>Payment Method:</strong> {activeBillDetail.payment_method}</p>
-              <p><strong>Date:</strong> {new Date(activeBillDetail.created_at || Date.now()).toLocaleString()}</p>
-            </div>
-
-            <table style={{ width: '100%', fontSize: '13px', textAlign: 'left', marginBottom: '16px', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '2px solid #333' }}>
-                  <th style={{ padding: '8px 4px' }}>Item</th>
-                  <th style={{ padding: '8px 4px' }}>Qty</th>
-                  <th style={{ padding: '8px 4px', textAlign: 'right' }}>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activeBillDetail.items?.map((item, idx) => (
-                  <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
-                    <td style={{ padding: '8px 4px', fontWeight: '600' }}>{item.food_name}</td>
-                    <td style={{ padding: '8px 4px' }}>x{item.quantity}</td>
-                    <td style={{ padding: '8px 4px', textAlign: 'right' }}>₹{item.subtotal}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <div style={{ textAlign: 'right', fontSize: '14px', lineHeight: '1.6', fontWeight: 'bold', borderTop: '2px solid #333', paddingTop: '10px' }}>
-              <p>Subtotal: ₹{activeBillDetail.subtotal}</p>
-              <p>Tax (5%): ₹{activeBillDetail.tax}</p>
-              <p style={{ fontSize: '18px', color: 'var(--accent-dark)', marginTop: '4px' }}>Grand Total: ₹{activeBillDetail.grand_total}</p>
-            </div>
-
-            <div className="no-print" style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
-              <button 
-                onClick={handlePrint} 
-                style={{ flex: 1, padding: '12px', background: 'var(--black)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}
-              >
-                🖨️ PRINT RECEIPT
-              </button>
-              <button 
-                onClick={() => { setActiveBillDetail(null); setIsCartOpen(false); }} 
-                style={{ flex: 1, padding: '12px', background: 'var(--accent-dark)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}
-              >
-                DONE
-              </button>
-            </div>
-          </div>
-        ) : cartItemsList.length === 0 ? (
+        {cartItemsList.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '40px 0' }}>
             <div style={{ fontSize: '48px', marginBottom: '12px' }}>🍽️</div>
-            <p style={{ color: 'var(--gray)', fontSize: '15px' }}>Your cart is empty.</p>
-            <p style={{ color: 'var(--gray)', fontSize: '13px', marginTop: '4px' }}>Explore our menu and add items to your order!</p>
+            <p style={{ color: 'var(--gray)', fontSize: '16px', fontWeight: '700' }}>Your cart is empty.</p>
+            <p style={{ color: 'var(--gray)', fontSize: '13px', marginTop: '6px' }}>Explore our menu and add delicious dishes to your order!</p>
           </div>
         ) : (
           <div>
             {/* Cart Items List */}
-            <div style={{ maxHeight: '240px', overflowY: 'auto', marginBottom: '16px' }}>
+            <div style={{ maxHeight: '260px', overflowY: 'auto', marginBottom: '20px', paddingRight: '4px' }}>
               {cartItemsList.map((item) => (
                 <div 
                   key={item.food_id}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #eee' }}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #eee' }}
                 >
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: '700', fontSize: '14px' }}>{item.food.name}</div>
+                  <div style={{ flex: 1, paddingRight: '12px' }}>
+                    <div style={{ fontWeight: '700', fontSize: '15px', color: 'var(--accent-dark)' }}>{item.food.name}</div>
                     <div style={{ fontSize: '12px', color: 'var(--gray)' }}>₹{item.food.price} each</div>
                   </div>
 
@@ -159,7 +129,7 @@ const CartDrawer = () => {
                     >
                       -
                     </button>
-                    <span style={{ fontWeight: '700', fontSize: '14px', width: '20px', textAlign: 'center' }}>
+                    <span style={{ fontWeight: '700', fontSize: '14px', width: '24px', textAlign: 'center' }}>
                       {item.quantity}
                     </span>
                     <button 
@@ -168,12 +138,13 @@ const CartDrawer = () => {
                     >
                       +
                     </button>
-                    <span style={{ fontWeight: '800', width: '60px', textAlign: 'right', fontSize: '14px' }}>
+                    <span style={{ fontWeight: '800', width: '70px', textAlign: 'right', fontSize: '14px' }}>
                       ₹{item.subtotal}
                     </span>
                     <button 
                       onClick={() => removeFromCart(item.food_id)}
-                      style={{ background: 'none', border: 'none', color: '#f43f5e', cursor: 'pointer', marginLeft: '6px' }}
+                      style={{ background: 'none', border: 'none', color: '#f43f5e', cursor: 'pointer', marginLeft: '6px', fontSize: '16px' }}
+                      title="Remove item"
                     >
                       🗑️
                     </button>
@@ -183,7 +154,7 @@ const CartDrawer = () => {
             </div>
 
             {/* Price Calculations */}
-            <div style={{ background: '#f9f9f9', padding: '12px 16px', borderRadius: '8px', marginBottom: '16px', fontSize: '13px' }}>
+            <div style={{ background: '#f8fafc', padding: '14px 18px', borderRadius: '10px', marginBottom: '20px', fontSize: '13px', border: '1px solid #e2e8f0', lineHeight: '1.7' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                 <span>Subtotal:</span>
                 <span>₹{cartSubtotal.toFixed(2)}</span>
@@ -192,7 +163,7 @@ const CartDrawer = () => {
                 <span>GST / Tax (5%):</span>
                 <span>₹{tax.toFixed(2)}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '800', fontSize: '16px', borderTop: '1px solid #ddd', paddingTop: '6px', color: 'var(--accent-dark)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '900', fontSize: '17px', borderTop: '1px solid #cbd5e1', paddingTop: '8px', marginTop: '4px', color: 'var(--accent-dark)' }}>
                 <span>Grand Total:</span>
                 <span>₹{grandTotal.toFixed(2)}</span>
               </div>
@@ -200,35 +171,35 @@ const CartDrawer = () => {
 
             {/* Checkout Details Form */}
             <form onSubmit={handleCheckout}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
                 <div>
-                  <label style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase' }}>Customer Name</label>
+                  <label style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: 'var(--gray)' }}>Customer Name *</label>
                   <input 
                     type="text" 
                     value={customerName} 
                     onChange={(e) => setCustomerName(e.target.value)}
                     required
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', marginTop: '4px' }}
+                    style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '6px', marginTop: '4px', fontSize: '14px' }}
                   />
                 </div>
                 <div>
-                  <label style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase' }}>Table / Location</label>
+                  <label style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: 'var(--gray)' }}>Table / Location *</label>
                   <input 
                     type="text" 
                     value={tableNumber} 
                     onChange={(e) => setTableNumber(e.target.value)}
                     required
-                    style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', marginTop: '4px' }}
+                    style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '6px', marginTop: '4px', fontSize: '14px' }}
                   />
                 </div>
               </div>
 
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase' }}>Payment Method</label>
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: 'var(--gray)' }}>Payment Method</label>
                 <select 
                   value={paymentMethod} 
                   onChange={(e) => setPaymentMethod(e.target.value)}
-                  style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px', marginTop: '4px' }}
+                  style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '6px', marginTop: '4px', fontSize: '14px' }}
                 >
                   <option value="Cash">Cash</option>
                   <option value="UPI / GPay">UPI / GPay / PhonePe</option>
@@ -239,7 +210,7 @@ const CartDrawer = () => {
               <button 
                 type="submit" 
                 disabled={isSubmitting}
-                style={{ width: '100%', padding: '14px', background: 'var(--accent-dark)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '800', letterSpacing: '1px', cursor: 'pointer' }}
+                style={{ width: '100%', padding: '15px', background: 'var(--accent-dark)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '900', fontSize: '15px', letterSpacing: '1px', cursor: 'pointer' }}
               >
                 {isSubmitting ? 'Placing Order...' : `PLACE ORDER (₹${grandTotal})`}
               </button>
