@@ -123,6 +123,55 @@ const seedSQLite = (db) => {
         );
       `);
 
+      db.run(`
+        CREATE TABLE IF NOT EXISTS users (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          email TEXT NOT NULL UNIQUE,
+          password TEXT NOT NULL,
+          role TEXT NOT NULL DEFAULT 'user',
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+
+      db.run(`
+        CREATE TABLE IF NOT EXISTS reservations (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER,
+          guest_name TEXT NOT NULL,
+          email TEXT NOT NULL,
+          phone TEXT NOT NULL,
+          party_size INTEGER NOT NULL DEFAULT 2,
+          date TEXT NOT NULL,
+          time_slot TEXT NOT NULL,
+          special_requests TEXT,
+          status TEXT DEFAULT 'Confirmed',
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+
+      // Seed Users
+      db.get('SELECT COUNT(*) as count FROM users', (err, row) => {
+        if (!err && row.count === 0) {
+          console.log('🌱 Seeding initial users into SQLite...');
+          const stmt = db.prepare('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)');
+          stmt.run('Spice Haven Admin', 'admin@spicehaven.com', 'admin123', 'admin');
+          stmt.run('Rahul Sharma', 'user@spicehaven.com', 'user123', 'user');
+          stmt.finalize();
+        }
+      });
+
+      // Seed Reservations
+      db.get('SELECT COUNT(*) as count FROM reservations', (err, row) => {
+        if (!err && row.count === 0) {
+          console.log('🌱 Seeding initial reservations into SQLite...');
+          const stmt = db.prepare('INSERT INTO reservations (user_id, guest_name, email, phone, party_size, date, time_slot, special_requests, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+          stmt.run(2, 'Rahul Sharma', 'user@spicehaven.com', '9876543210', 4, '2026-10-10', '7:30 PM', 'Window table preferred', 'Confirmed');
+          stmt.run(null, 'Priya Patel', 'priya@example.com', '9123456789', 2, '2026-10-11', '8:00 PM', 'Anniversary dinner', 'Confirmed');
+          stmt.finalize();
+        }
+      });
+
       // Seed categories
       db.get('SELECT COUNT(*) as count FROM categories', (err, row) => {
         if (!err && row.count === 0) {

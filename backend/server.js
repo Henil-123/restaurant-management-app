@@ -7,6 +7,8 @@ const foodRoutes = require('./routes/foodRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const billRoutes = require('./routes/billRoutes');
 const statsRoutes = require('./routes/statsRoutes');
+const authRoutes = require('./routes/authRoutes');
+const reservationRoutes = require('./routes/reservationRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -31,6 +33,8 @@ app.use('/api/foods', foodRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/bills', billRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/reservations', reservationRoutes);
 
 // Global Error Handler
 app.use(errorHandler);

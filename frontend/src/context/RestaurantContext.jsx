@@ -8,24 +8,24 @@ export const RestaurantProvider = ({ children }) => {
   const [categories, setCategories] = useState([]);
   const [stats, setStats] = useState(null);
   const [bills, setBills] = useState([]);
+  const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Active view tab: 'pos', 'menu', 'bills'
-  const [activeTab, setActiveTab] = useState('pos');
+  // Active view tab: 'home', 'menu', 'book-table', 'my-orders', 'about', 'admin-dashboard'
+  const [activePage, setActivePage] = useState('home');
 
   // Filters
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Cart / Bill Selection (foodId -> quantity)
+  // Cart (foodId -> quantity)
   const [cart, setCart] = useState({});
 
   // Modals state
   const [isFoodModalOpen, setIsFoodModalOpen] = useState(false);
   const [editingFood, setEditingFood] = useState(null);
-  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-  const [isBillHistoryOpen, setIsBillHistoryOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeBillDetail, setActiveBillDetail] = useState(null);
 
   // Notifications / Toast
@@ -33,7 +33,7 @@ export const RestaurantProvider = ({ children }) => {
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
+    setTimeout(() => setToast(null), 3500);
   };
 
   // Fetch initial data
@@ -85,11 +85,23 @@ export const RestaurantProvider = ({ children }) => {
     }
   };
 
+  const fetchReservations = async () => {
+    try {
+      const res = await api.get('/reservations');
+      if (res.data.success) {
+        setReservations(res.data.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch reservations:', err);
+    }
+  };
+
   useEffect(() => {
     fetchFoods();
     fetchCategories();
     fetchStats();
     fetchBills();
+    fetchReservations();
   }, []);
 
   // Food CRUD Operations
@@ -127,7 +139,6 @@ export const RestaurantProvider = ({ children }) => {
       const res = await api.delete(`/foods/${id}`);
       if (res.data.success) {
         showToast('Food item removed 🗑️', 'info');
-        // Remove from cart if present
         setCart((prev) => {
           const newCart = { ...prev };
           delete newCart[id];
@@ -155,12 +166,52 @@ export const RestaurantProvider = ({ children }) => {
     }
   };
 
-  // Cart & Quantity Buttons Logic (Week 8)
+  // Table Reservations Logic
+  const createReservation = async (reservationData) => {
+    try {
+      const res = await api.post('/reservations', reservationData);
+      if (res.data.success) {
+        showToast('Table reservation confirmed! 🥂');
+        fetchReservations();
+        return res.data.data;
+      }
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Failed to create reservation', 'error');
+      return null;
+    }
+  };
+
+  const updateReservationStatus = async (id, status) => {
+    try {
+      const res = await api.put(`/reservations/${id}/status`, { status });
+      if (res.data.success) {
+        showToast(`Reservation marked as ${status}`);
+        fetchReservations();
+      }
+    } catch (err) {
+      showToast('Failed to update status', 'error');
+    }
+  };
+
+  const deleteReservation = async (id) => {
+    try {
+      const res = await api.delete(`/reservations/${id}`);
+      if (res.data.success) {
+        showToast('Reservation deleted', 'info');
+        fetchReservations();
+      }
+    } catch (err) {
+      showToast('Failed to delete reservation', 'error');
+    }
+  };
+
+  // Cart Logic
   const addToCart = (foodId) => {
     setCart((prev) => ({
       ...prev,
       [foodId]: (prev[foodId] || 0) + 1
     }));
+    showToast('Added to order cart 🛒');
   };
 
   const updateCartQuantity = (foodId, delta) => {
@@ -186,12 +237,12 @@ export const RestaurantProvider = ({ children }) => {
 
   const clearCart = () => setCart({});
 
-  // Generate Bill Operation (Week 9)
+  // Generate Bill Operation
   const createBill = async (billData) => {
     try {
       const res = await api.post('/bills', billData);
       if (res.data.success) {
-        showToast('Bill generated & saved to database! 🧾');
+        showToast('Order placed & bill generated! 🧾');
         clearCart();
         fetchStats();
         fetchBills();
@@ -199,7 +250,7 @@ export const RestaurantProvider = ({ children }) => {
         return res.data.data;
       }
     } catch (err) {
-      showToast(err.response?.data?.message || 'Failed to generate bill', 'error');
+      showToast(err.response?.data?.message || 'Failed to place order', 'error');
       return null;
     }
   };
@@ -241,10 +292,11 @@ export const RestaurantProvider = ({ children }) => {
         categories,
         stats,
         bills,
+        reservations,
         loading,
         error,
-        activeTab,
-        setActiveTab,
+        activePage,
+        setActivePage,
         selectedCategory,
         setSelectedCategory,
         searchQuery,
@@ -261,22 +313,24 @@ export const RestaurantProvider = ({ children }) => {
         updateFood,
         deleteFood,
         toggleAvailability,
+        createReservation,
+        updateReservationStatus,
+        deleteReservation,
         createBill,
         isFoodModalOpen,
         openAddFoodModal,
         openEditFoodModal,
         closeFoodModal,
         editingFood,
-        isCartModalOpen,
-        setIsCartModalOpen,
-        isBillHistoryOpen,
-        setIsBillHistoryOpen,
+        isCartOpen,
+        setIsCartOpen,
         activeBillDetail,
         setActiveBillDetail,
         toast,
         showToast,
         fetchFoods,
-        fetchBills
+        fetchBills,
+        fetchReservations
       }}
     >
       {children}
