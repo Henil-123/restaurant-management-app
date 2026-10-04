@@ -96,6 +96,9 @@ const AdminDashboard = () => {
     (f.category_name && f.category_name.toLowerCase().includes(foodSearch.toLowerCase()))
   );
 
+  const rawRevenue = stats?.total_revenue || stats?.totalRevenue || bills.reduce((sum, b) => sum + parseFloat(b.grand_total || 0), 0);
+  const totalRevenueFormatted = parseFloat(rawRevenue || 0).toFixed(2);
+
   return (
     <div className="manager-container">
       {/* Header Banner */}
@@ -118,7 +121,7 @@ const AdminDashboard = () => {
             <div style={{ fontSize: '11px', letterSpacing: '1px' }}>BOOKINGS</div>
           </div>
           <div style={{ background: 'rgba(255,255,255,0.1)', padding: '10px 18px', borderRadius: '8px', textAlign: 'center' }}>
-            <div style={{ fontSize: '20px', fontWeight: '900', color: '#fde047' }}>₹{stats?.total_revenue || 0}</div>
+            <div style={{ fontSize: '20px', fontWeight: '900', color: '#fde047' }}>₹{totalRevenueFormatted}</div>
             <div style={{ fontSize: '11px', letterSpacing: '1px' }}>TOTAL REVENUE</div>
           </div>
         </div>
