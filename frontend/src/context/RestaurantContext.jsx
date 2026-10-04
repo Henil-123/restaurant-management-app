@@ -237,6 +237,28 @@ export const RestaurantProvider = ({ children }) => {
 
   const clearCart = () => setCart({});
 
+  // View Receipt Handler (Fetches items if missing)
+  const viewReceipt = async (billOrId) => {
+    try {
+      const billId = typeof billOrId === 'object' ? billOrId.id : billOrId;
+      if (typeof billOrId === 'object' && billOrId.items && billOrId.items.length > 0) {
+        setActiveBillDetail(billOrId);
+      } else {
+        const res = await api.get(`/bills/${billId}`);
+        if (res.data.success) {
+          setActiveBillDetail(res.data.data);
+        } else {
+          setActiveBillDetail(typeof billOrId === 'object' ? billOrId : null);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load receipt details:', err);
+      if (typeof billOrId === 'object') {
+        setActiveBillDetail(billOrId);
+      }
+    }
+  };
+
   // Generate Bill Operation
   const createBill = async (billData) => {
     try {
@@ -332,6 +354,7 @@ export const RestaurantProvider = ({ children }) => {
         openCart,
         activeBillDetail,
         setActiveBillDetail,
+        viewReceipt,
         toast,
         showToast,
         fetchFoods,

@@ -112,6 +112,13 @@ exports.getAllBills = async (req, res, next) => {
     params.push(parseInt(limit));
 
     const [rows] = await db.query(sql, params);
+
+    // Attach items array to each bill object
+    for (const bill of rows) {
+      const [items] = await db.query('SELECT * FROM bill_items WHERE bill_id = ?', [bill.id]);
+      bill.items = items;
+    }
+
     res.json({ success: true, count: rows.length, data: rows });
   } catch (err) {
     next(err);

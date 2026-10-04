@@ -9,7 +9,7 @@ const MyOrders = () => {
     setIsCartOpen, 
     bills, 
     reservations, 
-    setActiveBillDetail, 
+    viewReceipt, 
     setActivePage 
   } = useRestaurant();
 
@@ -119,10 +119,7 @@ const MyOrders = () => {
                     <td>
                       <button 
                         className="btn-sm btn-edit"
-                        onClick={() => {
-                          setActiveBillDetail(bill);
-                          setIsCartOpen(true);
-                        }}
+                        onClick={() => viewReceipt(bill)}
                       >
                         View Receipt
                       </button>

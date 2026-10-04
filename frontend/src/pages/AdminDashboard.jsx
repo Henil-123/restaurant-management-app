@@ -15,8 +15,7 @@ const AdminDashboard = () => {
     deleteReservation,
     bills,
     stats,
-    setActiveBillDetail,
-    setIsCartOpen
+    viewReceipt
   } = useRestaurant();
 
   const { user, isAdmin, openAuthModal } = useAuth();
@@ -412,10 +411,7 @@ const AdminDashboard = () => {
                     <td>
                       <button 
                         className="btn-sm btn-edit"
-                        onClick={() => {
-                          setActiveBillDetail(bill);
-                          setIsCartOpen(true);
-                        }}
+                        onClick={() => viewReceipt(bill)}
                       >
                         View Receipt
                       </button>

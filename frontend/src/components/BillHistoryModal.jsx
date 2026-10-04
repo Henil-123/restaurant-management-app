@@ -4,7 +4,7 @@ import { Receipt, Search, Eye, Calendar, User, CreditCard } from 'lucide-react';
 import api from '../api/axios';
 
 const BillHistoryModal = () => {
-  const { bills, setActiveBillDetail, setIsCartModalOpen } = useRestaurant();
+  const { bills, viewReceipt } = useRestaurant();
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredBills = bills.filter((b) =>
@@ -13,16 +13,8 @@ const BillHistoryModal = () => {
     (b.table_number && b.table_number.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const handleViewInvoice = async (billId) => {
-    try {
-      const res = await api.get(`/bills/${billId}`);
-      if (res.data.success) {
-        setActiveBillDetail(res.data.data);
-        setIsCartModalOpen(true);
-      }
-    } catch (err) {
-      console.error('Failed to view invoice detail', err);
-    }
+  const handleViewInvoice = (billId) => {
+    viewReceipt(billId);
   };
 
   return (
