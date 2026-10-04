@@ -13,10 +13,10 @@ import About from './pages/About';
 import AdminDashboard from './pages/AdminDashboard';
 
 const MainApp = () => {
-  const { activePage, toast } = useRestaurant();
+  const { activePage, toast, totalCartCount, openCart } = useRestaurant();
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       <Navbar />
 
       {/* Toast Notification */}
@@ -37,6 +37,17 @@ const MainApp = () => {
         }}>
           {toast.message}
         </div>
+      )}
+
+      {/* Floating Cart Button (Available on any page when items are in cart) */}
+      {totalCartCount > 0 && (
+        <button 
+          className="floating-cart-btn no-print"
+          onClick={openCart}
+          title="Open Order Cart"
+        >
+          <span>🛒</span> VIEW CART ({totalCartCount})
+        </button>
       )}
 
       {/* Main Dynamic Page Container */}

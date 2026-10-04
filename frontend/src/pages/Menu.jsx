@@ -7,7 +7,7 @@ const Menu = () => {
     categories, 
     addToCart, 
     totalCartCount, 
-    setIsCartOpen 
+    openCart 
   } = useRestaurant();
 
   const [activeCategory, setActiveCategory] = useState('All');
@@ -61,7 +61,7 @@ const Menu = () => {
 
             {totalCartCount > 0 && (
               <button 
-                onClick={() => setIsCartOpen(true)}
+                onClick={openCart}
                 style={{
                   background: 'var(--accent-dark)',
                   color: 'white',

@@ -19,8 +19,7 @@ const AuthModal = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
-    role: 'user'
+    password: ''
   });
 
   if (!authModalOpen) return null;
@@ -35,46 +34,25 @@ const AuthModal = () => {
       const res = await login(formData.email, formData.password);
       if (res?.success) {
         showToast(res.message);
-        if (formData.email.includes('admin')) {
+        if (formData.email.toLowerCase().includes('admin')) {
           setActivePage('admin-dashboard');
         } else {
           setActivePage('my-orders');
         }
       }
     } else {
-      const res = await register(formData.name, formData.email, formData.password, formData.role);
+      // New registered accounts are standard Users
+      const res = await register(formData.name, formData.email, formData.password, 'user');
       if (res?.success) {
         showToast(res.message);
-        if (formData.role === 'admin') {
-          setActivePage('admin-dashboard');
-        } else {
-          setActivePage('my-orders');
-        }
+        setActivePage('my-orders');
       }
-    }
-  };
-
-  const fillDemoAdmin = async () => {
-    setFormData({ name: 'Spice Haven Admin', email: 'admin@spicehaven.com', password: 'admin123', role: 'admin' });
-    const res = await login('admin@spicehaven.com', 'admin123');
-    if (res?.success) {
-      showToast('Logged in as Admin! 👑');
-      setActivePage('admin-dashboard');
-    }
-  };
-
-  const fillDemoUser = async () => {
-    setFormData({ name: 'Rahul Sharma', email: 'user@spicehaven.com', password: 'user123', role: 'user' });
-    const res = await login('user@spicehaven.com', 'user123');
-    if (res?.success) {
-      showToast('Logged in as User! 👤');
-      setActivePage('my-orders');
     }
   };
 
   return (
     <div className="modal-overlay" onClick={closeAuthModal} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
-      <div className="auth-box" onClick={(e) => e.stopPropagation()} style={{ position: 'relative', width: '100%', maxWidth: '440px', background: '#ffffff', borderRadius: '16px', padding: '36px 28px', boxShadow: '0 20px 50px rgba(0,0,0,0.3)', margin: 'auto' }}>
+      <div className="auth-box" onClick={(e) => e.stopPropagation()} style={{ position: 'relative', width: '100%', maxWidth: '420px', background: '#ffffff', borderRadius: '16px', padding: '36px 28px', boxShadow: '0 20px 50px rgba(0,0,0,0.3)', margin: 'auto' }}>
         <button 
           onClick={closeAuthModal} 
           style={{ position: 'absolute', right: '16px', top: '16px', border: 'none', background: 'none', fontSize: '22px', cursor: 'pointer', fontWeight: 'bold' }}
@@ -82,13 +60,13 @@ const AuthModal = () => {
           ✕
         </button>
 
-        <h2 className="auth-title">
-          {authMode === 'login' ? 'Welcome Back' : 'Create Account'}
+        <h2 className="auth-title" style={{ fontFamily: 'var(--font-display)', color: 'var(--accent-dark)', textAlign: 'center', fontSize: '28px', fontWeight: '900', marginBottom: '6px' }}>
+          {authMode === 'login' ? 'Welcome Back' : 'Create Customer Account'}
         </h2>
-        <p className="auth-subtitle">
+        <p className="auth-subtitle" style={{ textAlign: 'center', color: 'var(--gray)', fontSize: '13px', marginBottom: '24px' }}>
           {authMode === 'login' 
-            ? 'Sign in as Admin or User to continue' 
-            : 'Join Spice Haven for orders & table reservations'}
+            ? 'Sign in to access your orders and bookings' 
+            : 'Register for food ordering & table reservations'}
         </p>
 
         {authError && (
@@ -105,7 +83,7 @@ const AuthModal = () => {
                 type="text" 
                 name="name" 
                 className="auth-input" 
-                placeholder="Enter your name" 
+                placeholder="Enter your full name" 
                 value={formData.name} 
                 onChange={handleChange} 
                 required 
@@ -120,7 +98,7 @@ const AuthModal = () => {
               type="email" 
               name="email" 
               className="auth-input" 
-              placeholder="e.g. user@spicehaven.com" 
+              placeholder="e.g. rahul@example.com" 
               value={formData.email} 
               onChange={handleChange} 
               required 
@@ -128,7 +106,7 @@ const AuthModal = () => {
             />
           </div>
 
-          <div style={{ marginBottom: '14px' }}>
+          <div style={{ marginBottom: '16px' }}>
             <label style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: 'var(--gray)' }}>Password</label>
             <input 
               type="password" 
@@ -142,51 +120,27 @@ const AuthModal = () => {
             />
           </div>
 
-          {authMode === 'register' && (
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: 'var(--gray)', display: 'block', marginBottom: '4px' }}>Account Role</label>
-              <select 
-                name="role" 
-                className="auth-input" 
-                value={formData.role} 
-                onChange={handleChange}
-                style={{ width: '100%', padding: '10px 12px', border: '1px solid #ccc', borderRadius: '6px' }}
-              >
-                <option value="user">User (Order food &amp; Book table)</option>
-                <option value="admin">Admin (Manage food, bookings &amp; bills)</option>
-              </select>
-            </div>
-          )}
-
           <button 
             type="submit" 
             className="auth-btn" 
             disabled={authLoading}
-            style={{ width: '100%', padding: '12px', background: 'var(--accent-dark)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '800', letterSpacing: '1px', cursor: 'pointer', marginTop: '8px' }}
+            style={{ width: '100%', padding: '12px', background: 'var(--accent-dark)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: '800', letterSpacing: '1px', cursor: 'pointer' }}
           >
             {authLoading ? 'Processing...' : authMode === 'login' ? 'SIGN IN' : 'CREATE ACCOUNT'}
           </button>
         </form>
 
-        {/* Demo Credentials Quick Fill */}
-        <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #eee' }}>
-          <p style={{ fontSize: '11px', color: 'var(--gray)', textAlign: 'center', marginBottom: '10px', fontWeight: '800' }}>
-            ⚡ 1-CLICK DEMO LOGIN ACCOUNTS:
-          </p>
-          <div className="demo-btn-group" style={{ display: 'flex', gap: '10px' }}>
-            <button className="demo-btn" onClick={fillDemoAdmin} style={{ flex: 1, padding: '10px', fontSize: '12px', fontWeight: '800', border: '1.5px solid var(--accent-dark)', background: '#f4f4f5', color: 'var(--accent-dark)', borderRadius: '6px', cursor: 'pointer' }}>
-              👑 Admin Demo Login
-            </button>
-            <button className="demo-btn" onClick={fillDemoUser} style={{ flex: 1, padding: '10px', fontSize: '12px', fontWeight: '800', border: '1.5px solid var(--accent-dark)', background: '#f4f4f5', color: 'var(--accent-dark)', borderRadius: '6px', cursor: 'pointer' }}>
-              👤 User Demo Login
-            </button>
+        {/* System Credentials note */}
+        {authMode === 'login' && (
+          <div style={{ marginTop: '16px', background: '#f8fafc', padding: '10px 12px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '11px', color: '#64748b', textAlign: 'center' }}>
+            👑 System Admin Login: <strong>admin@spicehaven.com</strong> / <strong>admin123</strong>
           </div>
-        </div>
+        )}
 
         {/* Mode Switcher */}
         <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '13px' }}>
           {authMode === 'login' ? (
-            <p>
+            <p style={{ color: 'var(--gray)' }}>
               Don't have an account?{' '}
               <button 
                 onClick={() => setAuthMode('register')} 
@@ -196,7 +150,7 @@ const AuthModal = () => {
               </button>
             </p>
           ) : (
-            <p>
+            <p style={{ color: 'var(--gray)' }}>
               Already have an account?{' '}
               <button 
                 onClick={() => setAuthMode('login')} 

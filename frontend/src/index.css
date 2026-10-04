@@ -958,3 +958,70 @@ a      { text-decoration: none; color: inherit; }
   .footer-box { flex-direction: column; gap: 24px; }
   .footer-box3 { align-items: flex-start; }
 }
+
+/* ============================================
+   PRINT RECEIPT ONLY STYLES
+   ============================================ */
+@media print {
+  /* Hide all normal content and layout elements */
+  body, html, nav, footer, .modal-overlay {
+    background: #ffffff !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Make ONLY printable receipt visible */
+  .printable-receipt, .printable-receipt * {
+    visibility: visible !important;
+  }
+
+  .printable-receipt {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 24px !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Hide print/action buttons during printing */
+  .no-print, button {
+    display: none !important;
+  }
+}
+
+/* Floating Cart Button */
+.floating-cart-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--accent-dark);
+  color: var(--white);
+  border: none;
+  padding: 14px 24px;
+  border-radius: 50px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  cursor: pointer;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+.floating-cart-btn:hover {
+  transform: translateY(-3px) scale(1.04);
+  background: var(--accent-gold);
+  color: var(--black);
+}
+

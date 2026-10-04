@@ -285,6 +285,11 @@ export const RestaurantProvider = ({ children }) => {
   const cartSubtotal = cartItemsList.reduce((sum, item) => sum + item.subtotal, 0);
   const totalCartCount = Object.values(cart).reduce((sum, q) => sum + q, 0);
 
+  const openCart = () => {
+    setActiveBillDetail(null);
+    setIsCartOpen(true);
+  };
+
   return (
     <RestaurantContext.Provider
       value={{
@@ -324,6 +329,7 @@ export const RestaurantProvider = ({ children }) => {
         editingFood,
         isCartOpen,
         setIsCartOpen,
+        openCart,
         activeBillDetail,
         setActiveBillDetail,
         toast,

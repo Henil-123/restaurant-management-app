@@ -63,7 +63,7 @@ const CartDrawer = () => {
         onClick={(e) => e.stopPropagation()} 
         style={{ maxWidth: '540px', background: '#ffffff', color: '#000000', padding: '24px' }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '2px solid var(--accent-dark)', paddingBottom: '12px' }}>
+        <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '2px solid var(--accent-dark)', paddingBottom: '12px' }}>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: '900', color: 'var(--accent-dark)' }}>
             🛒 YOUR ORDER CART
           </h2>
@@ -78,13 +78,13 @@ const CartDrawer = () => {
         {/* Bill Receipt View (if bill just created) */}
         {activeBillDetail ? (
           <div className="printable-receipt" style={{ textAlign: 'center', padding: '16px' }}>
-            <div style={{ fontSize: '40px', marginBottom: '8px' }}>🎉</div>
-            <h3 style={{ fontFamily: 'var(--font-display)', color: 'var(--accent-dark)', fontSize: '22px' }}>Order Confirmed!</h3>
+            <div className="no-print" style={{ fontSize: '40px', marginBottom: '8px' }}>🎉</div>
+            <h3 style={{ fontFamily: 'var(--font-display)', color: 'var(--accent-dark)', fontSize: '22px' }}>Spice Haven Invoice</h3>
             <p style={{ color: 'var(--gray)', fontSize: '13px', marginBottom: '16px' }}>
               Bill Number: <strong>{activeBillDetail.bill_number}</strong>
             </p>
 
-            <div style={{ background: 'rgba(153,156,104,0.1)', padding: '16px', borderRadius: '8px', textAlign: 'left', marginBottom: '16px', fontSize: '13px' }}>
+            <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', textAlign: 'left', marginBottom: '16px', fontSize: '13px', border: '1px solid #e2e8f0' }}>
               <p><strong>Customer:</strong> {activeBillDetail.customer_name}</p>
               <p><strong>Table / Order:</strong> {activeBillDetail.table_number}</p>
               <p><strong>Payment Method:</strong> {activeBillDetail.payment_method}</p>
@@ -93,30 +93,30 @@ const CartDrawer = () => {
 
             <table style={{ width: '100%', fontSize: '13px', textAlign: 'left', marginBottom: '16px', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #ccc' }}>
-                  <th style={{ padding: '6px' }}>Item</th>
-                  <th style={{ padding: '6px' }}>Qty</th>
-                  <th style={{ padding: '6px', textAlign: 'right' }}>Total</th>
+                <tr style={{ borderBottom: '2px solid #333' }}>
+                  <th style={{ padding: '8px 4px' }}>Item</th>
+                  <th style={{ padding: '8px 4px' }}>Qty</th>
+                  <th style={{ padding: '8px 4px', textAlign: 'right' }}>Total</th>
                 </tr>
               </thead>
               <tbody>
                 {activeBillDetail.items?.map((item, idx) => (
                   <tr key={idx} style={{ borderBottom: '1px solid #eee' }}>
-                    <td style={{ padding: '6px' }}>{item.food_name}</td>
-                    <td style={{ padding: '6px' }}>x{item.quantity}</td>
-                    <td style={{ padding: '6px', textAlign: 'right' }}>₹{item.subtotal}</td>
+                    <td style={{ padding: '8px 4px', fontWeight: '600' }}>{item.food_name}</td>
+                    <td style={{ padding: '8px 4px' }}>x{item.quantity}</td>
+                    <td style={{ padding: '8px 4px', textAlign: 'right' }}>₹{item.subtotal}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
 
-            <div style={{ textAlign: 'right', fontSize: '14px', lineHeight: '1.6', fontWeight: 'bold' }}>
+            <div style={{ textAlign: 'right', fontSize: '14px', lineHeight: '1.6', fontWeight: 'bold', borderTop: '2px solid #333', paddingTop: '10px' }}>
               <p>Subtotal: ₹{activeBillDetail.subtotal}</p>
               <p>Tax (5%): ₹{activeBillDetail.tax}</p>
-              <p style={{ fontSize: '18px', color: 'var(--accent-dark)' }}>Grand Total: ₹{activeBillDetail.grand_total}</p>
+              <p style={{ fontSize: '18px', color: 'var(--accent-dark)', marginTop: '4px' }}>Grand Total: ₹{activeBillDetail.grand_total}</p>
             </div>
 
-            <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+            <div className="no-print" style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
               <button 
                 onClick={handlePrint} 
                 style={{ flex: 1, padding: '12px', background: 'var(--black)', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}
