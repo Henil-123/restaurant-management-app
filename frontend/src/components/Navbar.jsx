@@ -3,7 +3,7 @@ import { useRestaurant } from '../context/RestaurantContext';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
-  const { activePage, setActivePage, totalCartCount, setIsCartOpen } = useRestaurant();
+  const { activePage, setActivePage, totalCartCount } = useRestaurant();
   const { user, isAdmin, logout, openAuthModal } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -44,16 +44,15 @@ const Navbar = () => {
           MY ORDERS {totalCartCount > 0 && <span className="nav-cart-badge">{totalCartCount}</span>}
         </button>
         <button className={activePage === 'about' ? 'active' : ''} onClick={() => navigateTo('about')}>
-          ABOUT & CONTACT
+          ABOUT &amp; CONTACT
         </button>
 
-        {/* Admin Dashboard link (Visible to admin or click to log in as admin) */}
+        {/* Manager / Admin Dashboard Link */}
         <button 
           className={activePage === 'admin-dashboard' ? 'active' : ''} 
           onClick={() => {
-            if (isAdmin) {
-              navigateTo('admin-dashboard');
-            } else {
+            navigateTo('admin-dashboard');
+            if (!isAdmin) {
               openAuthModal('login');
             }
           }}
@@ -62,7 +61,7 @@ const Navbar = () => {
           {isAdmin ? '👑 ADMIN DASHBOARD' : 'MANAGER'}
         </button>
 
-        {/* User Auth state / Logout */}
+        {/* User Auth State / Login / Logout */}
         {user ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span className="nav-user-badge">
@@ -80,7 +79,9 @@ const Navbar = () => {
           </div>
         ) : (
           <button 
-            onClick={() => openAuthModal('login')}
+            onClick={() => {
+              openAuthModal('login');
+            }}
             style={{ color: 'var(--accent-dark)', fontWeight: '800' }}
           >
             LOGIN / REGISTER
